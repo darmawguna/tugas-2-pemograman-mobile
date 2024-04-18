@@ -14,7 +14,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late Future<Petani> futurePetani;
+  late Future<List<Petani>> futurePetani;
 
   @override
   void initState() {
@@ -34,25 +34,29 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Fetch Data Example'),
         ),
         body: Center(
-          child: FutureBuilder<Petani>(
+          child: FutureBuilder<List<Petani>>(
             future: futurePetani,
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                final petani = snapshot.data!;
-                // return Text("${petani.nama}");
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // Display a loading indicator while waiting for the future
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                // Display an error message if there's an error
+                return Text('Error: ${snapshot.error}');
+              } else if (snapshot.hasData) {
+                // Display the list of Petani if data is available
+                final List<Petani> petaniList = snapshot.data!;
                 return ListView.builder(
-                  itemCount: petani.length,
+                  itemCount: petaniList.length,
                   itemBuilder: (BuildContext context, int index) {
-                    // return PetaniList(petani: petani[index]);
-                    return Text(petani[index].nama);
+                    // Display each Petani's name
+                    return Text('${petaniList[index].nama}');
                   },
                 );
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
+              } else {
+                // Default case: Display a message when there's no data
+                return const Text('No data available');
               }
-
-              // By default, show a loading spinner.
-              return const CircularProgressIndicator();
             },
           ),
         ),
