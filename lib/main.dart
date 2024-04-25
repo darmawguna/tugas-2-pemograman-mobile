@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tugaske2/models/petani_model.dart';
+import 'package:tugaske2/screens/form_petani.dart';
+import 'package:tugaske2/screens/home_page.dart';
 import 'package:tugaske2/services/petani_service.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -15,51 +18,41 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late Future<List<Petani>> futurePetani;
+  final APiService apiService = APiService();
 
   @override
   void initState() {
     super.initState();
-    futurePetani = fetchPetani();
+    
+    futurePetani = apiService.fetchPetani();
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Fetch Data Example',
+      debugShowCheckedModeBanner: false,
+      title: 'Tugas API',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Fetch Data Example'),
-        ),
-        body: Center(
-          child: FutureBuilder<List<Petani>>(
-            future: futurePetani,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                // Display a loading indicator while waiting for the future
-                return const CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                // Display an error message if there's an error
-                return Text('Error: ${snapshot.error}');
-              } else if (snapshot.hasData) {
-                // Display the list of Petani if data is available
-                final List<Petani> petaniList = snapshot.data!;
-                return ListView.builder(
-                  itemCount: petaniList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    // Display each Petani's name
-                    return Text('${petaniList[index].nama}');
-                  },
+          title: const Text('Tugas API'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TambahEditPetaniPage(),
+                  ),
                 );
-              } else {
-                // Default case: Display a message when there's no data
-                return const Text('No data available');
-              }
-            },
-          ),
+              },
+            ),
+          ],
         ),
+        body: HomePage(futurePetani: futurePetani),
       ),
     );
   }

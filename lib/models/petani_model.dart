@@ -24,15 +24,15 @@ class Petani {
 
   factory Petani.fromJson(Map<String, dynamic> json) {
     return Petani(
-      idPenjual: json['idPenjual'],
-      idKelompokTani: json['idKelompokTani'],
+      idPenjual: json['id_penjual'],
+      idKelompokTani: json['id_kelompok_tani'],
       nama: json['nama'],
       nik: json['nik'],
       alamat: json['alamat'],
       telp: json['telp'],
       foto: json['foto'],
       status: json['status'],
-      namaKelompok: json['namaKelompok'],
+      namaKelompok: json['nama_kelompok'],
     );
   }
 
