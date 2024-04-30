@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:tugaske2/models/petani_model.dart';
+
 
 class DetailPetaniPage extends StatefulWidget {
   const DetailPetaniPage({super.key, required this.petani});
