@@ -20,21 +20,22 @@ class _TambahEditPetaniPageState extends State<TambahEditPetaniPage> {
   late String idKelompok;
 
   // Tambahkan variabel untuk menyimpan daftar kelompok tani
-  List<Kelompok> kelompokList = [];
+  List<KelompokPetani> kelompokList = [];
 
   // Tambahkan variabel untuk menyimpan nilai kelompok tani yang dipilih
-  Kelompok? selectedKelompok;
+  KelompokPetani? selectedKelompok;
 
   // Method untuk mengambil daftar kelompok tani dari server
   void _fetchKelompokTani() async {
     try {
-      List<Kelompok> kelompok = await APiService.getKelompokTani();
+      List<KelompokPetani> kelompok = await APiService.getKelompokTani();
       setState(() {
         kelompokList = kelompok;
         if (widget.petani != null) {
           // Jika ada data petani, set nilai idKelompok sesuai dengan data petani
           idKelompok = widget.petani!.idKelompokTani!;
           // Set nilai selectedKelompok sesuai dengan data petani
+          print(idKelompok);
           selectedKelompok = kelompok.firstWhere(
             (kelompok) =>
                 // ignore: unrelated_type_equality_checks
@@ -61,7 +62,6 @@ class _TambahEditPetaniPageState extends State<TambahEditPetaniPage> {
   @override
   Widget build(BuildContext context) {
     String pageTitle = widget.petani == null ? 'Tambah Petani' : 'Edit Petani';
-    
 
     // Controller untuk mengelola nilai input
     TextEditingController _namaController = TextEditingController();
@@ -69,7 +69,7 @@ class _TambahEditPetaniPageState extends State<TambahEditPetaniPage> {
     TextEditingController _alamatController = TextEditingController();
     TextEditingController _teleponController = TextEditingController();
     TextEditingController _statusController = TextEditingController();
-    
+
     // Implementasi logika untuk menyimpan nilai foto
 
     // Inisialisasi nilai input jika sedang dalam mode edit
@@ -80,7 +80,7 @@ class _TambahEditPetaniPageState extends State<TambahEditPetaniPage> {
       _teleponController.text = widget.petani!.telp ?? '';
       _statusController.text = widget.petani!.status ?? '';
       idKelompok = widget.petani!.idKelompokTani!.toString();
-      
+
       // Implementasi logika untuk menampilkan foto
     }
 
@@ -181,7 +181,7 @@ class _TambahEditPetaniPageState extends State<TambahEditPetaniPage> {
               ),
               Padding(
                 padding: const EdgeInsets.all(5),
-                child: DropdownButtonFormField<Kelompok>(
+                child: DropdownButtonFormField<KelompokPetani>(
                   value:
                       selectedKelompok, // Nilai terpilih sesuai dengan data petani
                   hint: const Text("Pilih Kelompok"),
@@ -189,7 +189,7 @@ class _TambahEditPetaniPageState extends State<TambahEditPetaniPage> {
                     icon: Icon(Icons.category_rounded),
                   ),
                   items: kelompokList.map((item) {
-                    return DropdownMenuItem<Kelompok>(
+                    return DropdownMenuItem<KelompokPetani>(
                       value: item,
                       child: Text("${item.namaKelompok}"),
                     );
