@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tugaske2/main.dart';
 import 'package:tugaske2/models/kelompok_tani_model.dart';
+import 'package:tugaske2/models/petani_model.dart';
 import 'package:tugaske2/services/petani_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'dart:convert';
 
 class InputFormPetani extends StatefulWidget {
   const InputFormPetani({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _InputFormPetaniState createState() => _InputFormPetaniState();
 }
 
@@ -38,11 +43,18 @@ class _InputFormPetaniState extends State<InputFormPetani> {
     }
   }
 
+  // final List<KelompokPetani> _kelompokLis = [
+  //   KelompokPetani(idKelompokTani: '1', namaKelompok: 'Suda Mula'),
+  //   KelompokPetani(idKelompokTani: '2', namaKelompok: 'Sandi Merta'),
+  //   KelompokPetani(idKelompokTani: '3', namaKelompok: 'Jaya Mula'),
+  //   KelompokPetani(idKelompokTani: '4', namaKelompok: 'Sudiwana Mandiri'),
+  // ];
+
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       // Lakukan sesuatu dengan data yang sudah diisi
-      print('Alamat: $_nik');
-      print('Alamat: $_nama');
+      print('Nama: $_nama');
+      print('NIK: $_nik');
       print('Alamat: $_alamat');
       print('Telepon: $_telp');
       print('ID Kelompok Tani: $_idKelompok');
@@ -51,21 +63,66 @@ class _InputFormPetaniState extends State<InputFormPetani> {
     }
   }
 
+  void _saveData() async {
+    try {
+      await APiService().createPetani(Petani(
+        idKelompokTani: _idKelompok,
+        nama: _nama,
+        nik: _nik,
+        alamat: _alamat,
+        telp: _telp,
+        foto: _fotoPath,
+        status: _status,
+      ));
+      Fluttertoast.showToast(
+        msg: 'Data berhasil ditambahkan',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+
+      // Kembali ke halaman utama
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const MyApp(),
+        ),
+      );
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: 'Error: $e',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
   // method untuk fetching data kelompok tani
   Future<void> _fetchKelompokTani() async {
     try {
-      List<KelompokPetani> _kelompokList = await APiService.getKelompokTani();
+      final response =
+          await http.get(Uri.parse('https://dev.wefgis.com/api/kelompoktani'));
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body) as List;
+        setState(() {
+          _kelompokList =
+              jsonData.map((item) => KelompokPetani.fromJson(item)).toList();
+        });
+      } else {
+        throw Exception('Failed to load data');
+      }
     } catch (e) {
-      print('Error fetching kelompok tani: $e');
+      print('Error fetching data: $e');
     }
   }
 
   @override
   void initState() {
     super.initState();
-    // Panggil method untuk mengambil daftar kelompok tani
-    // _fetchKelompokTani();
-    // futurePetani = apiService.fetchPetani();
+    _fetchKelompokTani();
   }
 
   @override
@@ -81,10 +138,10 @@ class _InputFormPetaniState extends State<InputFormPetani> {
           child: Column(
             children: [
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Nik'),
+                decoration: const InputDecoration(labelText: 'NIK'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Alamat tidak boleh kosong';
+                    return 'NIK tidak boleh kosong';
                   }
                   return null;
                 },
@@ -95,7 +152,7 @@ class _InputFormPetaniState extends State<InputFormPetani> {
                 decoration: const InputDecoration(labelText: 'Nama'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Alamat tidak boleh kosong';
+                    return 'Nama tidak boleh kosong';
                   }
                   return null;
                 },
@@ -130,6 +187,7 @@ class _InputFormPetaniState extends State<InputFormPetani> {
                 onChanged: (newValue) {
                   setState(() {
                     _selectedKelompok = newValue;
+                    _idKelompok = newValue!.idKelompokTani;
                   });
                 },
                 items: _kelompokList.map<DropdownMenuItem<KelompokPetani>>(
@@ -153,24 +211,24 @@ class _InputFormPetaniState extends State<InputFormPetani> {
               // Radio button untuk status
               ListTile(
                 title: const Text("Inactive"),
-                leading: Radio(
+                leading: Radio<String>(
                   value: "inactive",
                   groupValue: _status,
                   onChanged: (value) {
                     setState(() {
-                      _status = value.toString();
+                      _status = value!;
                     });
                   },
                 ),
               ),
               ListTile(
                 title: const Text("Active"),
-                leading: Radio(
+                leading: Radio<String>(
                   value: "active",
                   groupValue: _status,
                   onChanged: (value) {
                     setState(() {
-                      _status = value.toString();
+                      _status = value!;
                     });
                   },
                 ),
@@ -199,7 +257,8 @@ class _InputFormPetaniState extends State<InputFormPetani> {
               ElevatedButton(
                 onPressed: () {
                   _formKey.currentState!.save();
-                  _submitForm();
+                  // _submitForm();
+                  _saveData();
                 },
                 child: const Text('Submit'),
               ),
