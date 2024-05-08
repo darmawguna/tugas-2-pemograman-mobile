@@ -45,12 +45,6 @@ class _InputFormPetaniState extends State<InputFormPetani> {
     }
   }
 
-  // final List<KelompokPetani> _kelompokLis = [
-  //   KelompokPetani(idKelompokTani: '1', namaKelompok: 'Suda Mula'),
-  //   KelompokPetani(idKelompokTani: '2', namaKelompok: 'Sandi Merta'),
-  //   KelompokPetani(idKelompokTani: '3', namaKelompok: 'Jaya Mula'),
-  //   KelompokPetani(idKelompokTani: '4', namaKelompok: 'Sudiwana Mandiri'),
-  // ];
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
