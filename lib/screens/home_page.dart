@@ -4,6 +4,7 @@ import 'package:tugaske2/main.dart';
 import 'package:tugaske2/models/petani_model.dart';
 
 import 'package:tugaske2/screens/detail_page_petani.dart';
+import 'package:tugaske2/screens/form_input_petani.dart';
 import 'package:tugaske2/screens/form_petani.dart';
 
 import 'package:tugaske2/services/petani_service.dart';
@@ -34,6 +35,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Petani List'),
+        
       ),
       body: Center(
         child: FutureBuilder<List<Petani>>(
@@ -96,8 +98,9 @@ class _HomePageState extends State<HomePage> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            TambahEditPetaniPage(
+                                            InputFormPetani(
                                           petani: petaniList[index],
+                                          
                                         ),
                                       ),
                                     );
@@ -184,7 +187,10 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => TambahEditPetaniPage(),
+              // builder: (context) => const TambahEditPetaniPage(),
+              builder: (context) => const InputFormPetani(
+                petani: Petani(),
+              ),
             ),
           );
         },

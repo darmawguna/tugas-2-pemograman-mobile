@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:tugaske2/models/new_petani_model.dart';
 import 'package:tugaske2/models/petani_model.dart';
 import 'package:tugaske2/screens/form_petani.dart';
 import 'package:tugaske2/screens/home_page.dart';
+import 'package:tugaske2/screens/homepage.dart';
+import 'package:tugaske2/screens/petani_page.dart';
 import 'package:tugaske2/services/petani_service.dart';
 
 
@@ -23,7 +26,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    
     futurePetani = apiService.fetchPetani();
   }
 
@@ -38,21 +40,10 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Tugas API'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const TambahEditPetaniPage(),
-                  ),
-                );
-              },
-            ),
-          ],
         ),
-        body: HomePage(futurePetani: futurePetani),
+        body: HomePage(
+          futurePetani: futurePetani,
+        ),
       ),
     );
   }

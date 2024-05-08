@@ -3,10 +3,10 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tugaske2/models/err_message.dart';
 import 'package:tugaske2/models/kelompok_tani_model.dart';
 import 'package:tugaske2/models/new_petani_model.dart';
 import 'package:tugaske2/models/petani_model.dart';
-
 
 class APiService {
   //static final host='http://192.168.43.189/webtani/public';
@@ -22,6 +22,7 @@ class APiService {
   static getHost() {
     return host;
   }
+
   // Fetch all petani
   Future<List<Petani>> fetchPetani() async {
     final response =
@@ -105,7 +106,7 @@ class APiService {
   }
 
   // get kelompok petani
-  static Future<List<Kelompok>> getKelompokTani() async {
+  static Future<List<KelompokPetani>> getKelompokTani() async {
     try {
       final response =
           await http.get(Uri.parse("$host/api/kelompoktani"), headers: {
@@ -114,12 +115,58 @@ class APiService {
       if (response.statusCode == 200) {
         var json = jsonDecode(response.body);
         final parsed = json.cast<Map<String, dynamic>>();
-        return parsed.map<Kelompok>((json) => Kelompok.fromJson(json)).toList();
+        return parsed
+            .map<KelompokPetani>((json) => KelompokPetani.fromJson(json))
+            .toList();
       } else {
         return [];
       }
     } catch (e) {
       return [];
+    }
+  }
+
+  static Future<ErrorMSG> savePetani(petani, filepath) async {
+    try {
+      print(petani);
+      var url = Uri.parse('https://dev.wefgis.com/api/petani');
+
+      var request = http.MultipartRequest('POST', url);
+      request.fields['nama'] = petani.nama;
+      request.fields['nik'] = petani.nik;
+      request.fields['alamat'] = petani.alamat;
+      request.fields['telp'] = petani.telp;
+      request.fields['status'] = petani.status;
+      request.fields['id_kelompok_tani'] = petani.idKelompokTani;
+      if (filepath != '') {
+        request.files.add(await http.MultipartFile.fromPath('foto', filepath));
+      }
+      request.headers.addAll({
+        'Authorization': 'Bearer ' + _token,
+      });
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        // return Petani.fromJson(jsonDecode(response.body));
+        final respStr = await response.stream.bytesToString();
+        print(jsonDecode(respStr));
+        // print(respStr);
+
+        // return Petani.fromJson(jsonDecode(response.body));
+        return ErrorMSG.fromJson(jsonDecode(respStr));
+        // return ErrorMSG.fromJson(jsonDecode(respStr));
+      } else {
+        //return ErrorMSG.fromJson(jsonDecode(response.body));
+        // return ErrorMSG(success: false, message: 'err Request');
+
+        throw Exception('Failed to update petani');
+      }
+    } catch (e) {
+      // ErrorMSG responseRequest =
+      //     ErrorMSG(success: false, message: 'error caught: $e');
+      // return responseRequest;
+      print(e);
+      throw Exception('Error $e');
     }
   }
 }

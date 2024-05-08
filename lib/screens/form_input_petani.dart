@@ -10,9 +10,11 @@ import 'dart:async';
 import 'dart:convert';
 
 class InputFormPetani extends StatefulWidget {
-  const InputFormPetani({super.key});
+  final Petani petani;
+  const InputFormPetani({required this.petani,super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _InputFormPetaniState createState() => _InputFormPetaniState();
 }
 
@@ -65,15 +67,17 @@ class _InputFormPetaniState extends State<InputFormPetani> {
 
   void _saveData() async {
     try {
-      await APiService().createPetani(Petani(
-        idKelompokTani: _idKelompok,
-        nama: _nama,
-        nik: _nik,
-        alamat: _alamat,
-        telp: _telp,
-        foto: _fotoPath,
-        status: _status,
-      ));
+      await APiService.savePetani(
+          Petani(
+            idKelompokTani: _idKelompok,
+            nama: _nama,
+            nik: _nik,
+            alamat: _alamat,
+            telp: _telp,
+            // foto: _fotoPath,
+            status: _status,
+          ),
+          _fotoPath);
       Fluttertoast.showToast(
         msg: 'Data berhasil ditambahkan',
         toastLength: Toast.LENGTH_SHORT,
@@ -81,7 +85,6 @@ class _InputFormPetaniState extends State<InputFormPetani> {
         backgroundColor: Colors.green,
         textColor: Colors.white,
       );
-
       // Kembali ke halaman utama
       Navigator.pushReplacement(
         context,
@@ -242,7 +245,7 @@ class _InputFormPetaniState extends State<InputFormPetani> {
                       decoration: const InputDecoration(
                         labelText: 'Foto',
                       ),
-                      controller: TextEditingController(text: _fotoPath),
+                      // controller: TextEditingController(text: _fotoPath),
                     ),
                   ),
                   IconButton(
