@@ -10,8 +10,8 @@ import 'dart:async';
 import 'dart:convert';
 
 class InputFormPetani extends StatefulWidget {
-  final Petani petani;
-  const InputFormPetani({required this.petani,super.key});
+  final Petani? petani;
+  const InputFormPetani({required this.petani, super.key});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -45,7 +45,6 @@ class _InputFormPetaniState extends State<InputFormPetani> {
     }
   }
 
-
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       // Lakukan sesuatu dengan data yang sudah diisi
@@ -61,24 +60,49 @@ class _InputFormPetaniState extends State<InputFormPetani> {
 
   void _saveData() async {
     try {
-      await APiService.savePetani(
+      if (widget.petani == null) {
+        // Menambahkan data baru
+        await APiService.savePetani(
           Petani(
             idKelompokTani: _idKelompok,
             nama: _nama,
             nik: _nik,
             alamat: _alamat,
             telp: _telp,
-            // foto: _fotoPath,
             status: _status,
           ),
-          _fotoPath);
-      Fluttertoast.showToast(
-        msg: 'Data berhasil ditambahkan',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
+          _fotoPath,
+        );
+        Fluttertoast.showToast(
+          msg: 'Data berhasil ditambahkan',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+      } else {
+        // Mengedit data yang sudah ada
+        await APiService.editPetani(
+          widget.petani?.idPenjual,
+          Petani(
+            idPenjual: widget.petani?.idPenjual,
+            idKelompokTani: _idKelompok,
+            nama: _nama,
+            nik: _nik,
+            alamat: _alamat,
+            telp: _telp,
+            status: _status,
+          ),
+          _fotoPath,
+        );
+        Fluttertoast.showToast(
+          msg: 'Data berhasil diperbarui',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+      }
       // Kembali ke halaman utama
       Navigator.pushReplacement(
         context,
@@ -120,13 +144,34 @@ class _InputFormPetaniState extends State<InputFormPetani> {
   void initState() {
     super.initState();
     _fetchKelompokTani();
+
+    if (widget.petani != null) {
+      _nik = widget.petani!.nik ?? '';
+      _nama = widget.petani!.nama ?? '';
+      _alamat = widget.petani!.alamat ?? '';
+      _telp = widget.petani!.telp ?? '';
+      _status = widget.petani!.status ?? '';
+      // Cari kelompok tani sesuai dengan ID petani
+      if (_kelompokList.isNotEmpty) {
+        _selectedKelompok = _kelompokList.firstWhere(
+          (kelompok) =>
+              kelompok.idKelompokTani == widget.petani!.idKelompokTani,
+          orElse: () => _kelompokList[0],
+        );
+      } else {
+        // Jika _kelompokList kosong, atur _selectedKelompok menjadi null atau nilai default
+        _selectedKelompok =
+            null; // Atau nilai default yang sesuai dengan aplikasi Anda
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Input Form Petani'),
+        title: Text(
+            widget.petani == null ? 'Input Form Petani' : 'Edit Form Petani'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
@@ -257,7 +302,7 @@ class _InputFormPetaniState extends State<InputFormPetani> {
                   // _submitForm();
                   _saveData();
                 },
-                child: const Text('Submit'),
+                child: Text(widget.petani == null ? 'Submit' : 'Update'),
               ),
             ],
           ),

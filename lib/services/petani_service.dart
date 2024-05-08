@@ -69,28 +69,49 @@ class APiService {
   }
 
   // Update an existing petani
-  Future<Petani> updatePetani(Petani petani) async {
-    final response = await http.put(
-      Uri.parse('https://dev.wefgis.com/api/petani/${petani.idPenjual}'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'id_kelompok_tani': petani.idKelompokTani,
-        'nama': petani.nama,
-        'nik': petani.nik,
-        'alamat': petani.alamat,
-        'telp': petani.telp,
-        'foto': petani.foto,
-        'status': petani.status,
-        'nama_kelompok': petani.namaKelompok,
-      }),
-    );
+  static Future<ErrorMSG> editPetani(idPenjual, petani, filepath) async {
+    try {
+      print(petani);
+      print(idPenjual);
 
-    if (response.statusCode == 200) {
-      return Petani.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to update petani');
+      var url = Uri.parse('https://dev.wefgis.com/api/petani/$idPenjual');
+
+      var request = http.MultipartRequest('POST', url);
+      request.fields['nama'] = petani.nama!;
+      request.fields['nik'] = petani.nik!;
+      request.fields['alamat'] = petani.alamat!;
+      request.fields['telp'] = petani.telp!;
+      request.fields['status'] = petani.status!;
+      request.fields['id_kelompok_tani'] = petani.idKelompokTani!;
+      if (filepath != '') {
+        request.files.add(await http.MultipartFile.fromPath('foto', filepath));
+      }
+      request.headers.addAll({
+        'Authorization': 'Bearer ' + _token,
+      });
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        // return Petani.fromJson(jsonDecode(response.body));
+        final respStr = await response.stream.bytesToString();
+        print(jsonDecode(respStr));
+        // print(respStr);
+
+        // return Petani.fromJson(jsonDecode(response.body));
+        return ErrorMSG.fromJson(jsonDecode(respStr));
+        // return ErrorMSG.fromJson(jsonDecode(respStr));
+      } else {
+        //return ErrorMSG.fromJson(jsonDecode(response.body));
+        // return ErrorMSG(success: false, message: 'err Request');
+
+        throw Exception('Failed to update petani');
+      }
+    } catch (e) {
+      // ErrorMSG responseRequest =
+      //     ErrorMSG(success: false, message: 'error caught: $e');
+      // return responseRequest;
+      print(e);
+      throw Exception('Error $e');
     }
   }
 
@@ -130,6 +151,9 @@ class APiService {
     try {
       print(petani);
       var url = Uri.parse('https://dev.wefgis.com/api/petani');
+      // if (id != 0) {
+      //   url = Uri.parse('$host/api/petani/' + id.toString());
+      // }
 
       var request = http.MultipartRequest('POST', url);
       request.fields['nama'] = petani.nama;

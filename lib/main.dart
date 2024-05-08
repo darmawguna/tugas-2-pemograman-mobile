@@ -7,7 +7,6 @@ import 'package:tugaske2/screens/homepage.dart';
 import 'package:tugaske2/screens/petani_page.dart';
 import 'package:tugaske2/services/petani_service.dart';
 
-
 void main() {
   runApp(const MyApp());
 }
@@ -20,13 +19,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late Future<List<Petani>> futurePetani;
-  final APiService apiService = APiService();
+  // late Future<List<Petani>> futurePetani;
+  // final APiService apiService = APiService();
 
   @override
   void initState() {
     super.initState();
-    futurePetani = apiService.fetchPetani();
+    // futurePetani = apiService.fetchPetani();
   }
 
   @override
@@ -41,9 +40,7 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Tugas API'),
         ),
-        body: HomePage(
-          futurePetani: futurePetani,
-        ),
+        body: const HomePage(),
       ),
     );
   }

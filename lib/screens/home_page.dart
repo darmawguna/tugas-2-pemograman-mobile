@@ -12,10 +12,7 @@ import 'package:tugaske2/services/petani_service.dart';
 class HomePage extends StatefulWidget {
   const HomePage({
     super.key,
-    required this.futurePetani,
   });
-
-  final Future<List<Petani>> futurePetani;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -24,10 +21,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late final APiService _apiService;
 
+  late Future<List<Petani>> futurePetani;
+
   @override
   void initState() {
     super.initState();
+
     _apiService = APiService();
+    futurePetani = _apiService.fetchPetani();
+    setState(() {});
   }
 
   @override
@@ -35,11 +37,10 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Petani List'),
-        
       ),
       body: Center(
         child: FutureBuilder<List<Petani>>(
-          future: widget.futurePetani,
+          future: futurePetani,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               // Display a loading indicator while waiting for the future
@@ -97,10 +98,8 @@ class _HomePageState extends State<HomePage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            InputFormPetani(
+                                        builder: (context) => EditFormPetani(
                                           petani: petaniList[index],
-                                          
                                         ),
                                       ),
                                     );
@@ -178,7 +177,6 @@ class _HomePageState extends State<HomePage> {
               // Default case: Display a message when there's no data
               return const Text('No data available');
             }
-
           },
         ),
       ),
