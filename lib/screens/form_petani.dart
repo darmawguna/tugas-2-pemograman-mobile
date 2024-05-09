@@ -46,32 +46,6 @@ class _EditFormPetaniState extends State<EditFormPetani> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchKelompokTani();
-    // Jika petani diberikan, isi nilai-nilai default dari petani
-    if (widget.petani != null) {
-      _nik = widget.petani!.nik ?? '';
-      _nama = widget.petani!.nama ?? '';
-      _alamat = widget.petani!.alamat ?? '';
-      _telp = widget.petani!.telp ?? '';
-      _status = widget.petani!.status ?? '';
-      // Cari kelompok tani sesuai dengan ID petani
-      if (_kelompokList.isNotEmpty) {
-        _selectedKelompok = _kelompokList.firstWhere(
-          (kelompok) =>
-              kelompok.idKelompokTani == widget.petani!.idKelompokTani,
-          orElse: () => _kelompokList[0],
-        );
-      } else {
-        // Jika _kelompokList kosong, atur _selectedKelompok menjadi null atau nilai default
-        _selectedKelompok =
-            null; // Atau nilai default yang sesuai dengan aplikasi Anda
-      }
-    }
-  }
-
   // method untuk fetching data kelompok tani
   Future<void> _fetchKelompokTani() async {
     try {
@@ -151,6 +125,43 @@ class _EditFormPetaniState extends State<EditFormPetani> {
         backgroundColor: Colors.red,
         textColor: Colors.white,
       );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchKelompokTani();
+    print(_kelompokList);
+    // Jika petani diberikan, isi nilai-nilai default dari petani
+    if (widget.petani != null) {
+      _nik = widget.petani!.nik ?? '';
+      _nama = widget.petani!.nama ?? '';
+      _alamat = widget.petani!.alamat ?? '';
+      _telp = widget.petani!.telp ?? '';
+      _status = widget.petani!.status ?? '';
+      _idKelompok = widget.petani!.idKelompokTani!;
+
+      print(_kelompokList);
+      // Cari kelompok tani sesuai dengan ID petani
+      _selectedKelompok = _kelompokList.isNotEmpty
+          ? _kelompokList.firstWhere(
+              (kelompok) => kelompok.idKelompokTani == _idKelompok,
+              orElse: () => _kelompokList
+                  .first, // Jika tidak ditemukan, ambil elemen pertama dari _kelompokList
+            )
+          : null; // Jika _kelompokList kosong, atur _selectedKelompok menjadi null atau nilai default
+
+      // if (_kelompokList.isNotEmpty) {
+      //   _selectedKelompok = _kelompokList.firstWhere(
+      //     (kelompok) => kelompok.idKelompokTani == _idKelompok,
+      //     orElse: () => _kelompokList[0],
+      //   );
+      // } else {
+      //   // Jika _kelompokList kosong, atur _selectedKelompok menjadi null atau nilai default
+      //   _selectedKelompok =
+      //       null; // Atau nilai default yang sesuai dengan aplikasi Anda
+      // }
     }
   }
 

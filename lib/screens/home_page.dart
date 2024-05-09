@@ -186,8 +186,8 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(
               // builder: (context) => const TambahEditPetaniPage(),
-              builder: (context) => const InputFormPetani(
-                petani: Petani(),
+              builder: (context) => const EditFormPetani(
+                  // petani: Petani(),
               ),
             ),
           );
