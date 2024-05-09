@@ -56,6 +56,13 @@ class _EditFormPetaniState extends State<EditFormPetani> {
         setState(() {
           _kelompokList =
               jsonData.map((item) => KelompokPetani.fromJson(item)).toList();
+          if (widget.petani != null) {
+            _selectedKelompok = _kelompokList.firstWhere(
+              (kelompok) =>
+                  kelompok.idKelompokTani == widget.petani!.idKelompokTani,
+              orElse: () => _kelompokList.first,
+            );
+          }
         });
       } else {
         throw Exception('Failed to load data');
@@ -143,25 +150,7 @@ class _EditFormPetaniState extends State<EditFormPetani> {
       _idKelompok = widget.petani!.idKelompokTani!;
 
       print(_kelompokList);
-      // Cari kelompok tani sesuai dengan ID petani
-      _selectedKelompok = _kelompokList.isNotEmpty
-          ? _kelompokList.firstWhere(
-              (kelompok) => kelompok.idKelompokTani == _idKelompok,
-              orElse: () => _kelompokList
-                  .first, // Jika tidak ditemukan, ambil elemen pertama dari _kelompokList
-            )
-          : null; // Jika _kelompokList kosong, atur _selectedKelompok menjadi null atau nilai default
 
-      // if (_kelompokList.isNotEmpty) {
-      //   _selectedKelompok = _kelompokList.firstWhere(
-      //     (kelompok) => kelompok.idKelompokTani == _idKelompok,
-      //     orElse: () => _kelompokList[0],
-      //   );
-      // } else {
-      //   // Jika _kelompokList kosong, atur _selectedKelompok menjadi null atau nilai default
-      //   _selectedKelompok =
-      //       null; // Atau nilai default yang sesuai dengan aplikasi Anda
-      // }
     }
   }
 
