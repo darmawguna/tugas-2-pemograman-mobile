@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -46,6 +48,18 @@ class _EditFormPetaniState extends State<EditFormPetani> {
     }
   }
 
+  // Method untuk memilih gambar dari galeri
+  Future<void> _pickImageFromGallery() async {
+    final pickedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      setState(() {
+        // Ubah nilai fotoController sesuai dengan gambar yang dipilih dari galeri
+        _fotoPath = pickedImage.path;
+      });
+    }
+  }
+
   // method untuk fetching data kelompok tani
   Future<void> _fetchKelompokTani() async {
     try {
@@ -63,7 +77,6 @@ class _EditFormPetaniState extends State<EditFormPetani> {
               orElse: () => _kelompokList.first,
             );
           }
-
         });
       } else {
         throw Exception('Failed to load data');
@@ -140,7 +153,9 @@ class _EditFormPetaniState extends State<EditFormPetani> {
   void initState() {
     super.initState();
     _fetchKelompokTani();
-    print(_kelompokList);
+    // print(_kelompokList);
+
+    print(widget.petani?.foto);
     // Jika petani diberikan, isi nilai-nilai default dari petani
     if (widget.petani != null) {
       _nik = widget.petani!.nik ?? '';
@@ -150,8 +165,7 @@ class _EditFormPetaniState extends State<EditFormPetani> {
       _status = widget.petani!.status ?? '';
       _idKelompok = widget.petani!.idKelompokTani!;
 
-      print(_kelompokList);
-
+      print(_fotoPath);
     }
   }
 
@@ -270,8 +284,41 @@ class _EditFormPetaniState extends State<EditFormPetani> {
                 ),
               ),
               const SizedBox(height: 20.0),
+              _fotoPath != ''
+                  ? Image.file(
+                      // Menampilkan gambar yang dipilih
+                      File(_fotoPath),
+                      width: 200,
+                      height: 200,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.error, color: Colors.red),
+                            Text('Gambar tidak dapat diakses'),
+                          ],
+                        );
+                      },
+                    )
+                  : Container(
+                      width: 200,
+                      height: 200,
+                      color: Colors.grey,
+                      child: Icon(
+                        Icons.image,
+                        size: 100,
+                        color: Colors.white,
+                      ),
+                    ),
+
+              const SizedBox(height: 20.0),
               Row(
                 children: [
+                  IconButton(
+                    icon: Icon(Icons.photo_library),
+                    onPressed: _pickImageFromGallery,
+                  ),
                   Expanded(
                     child: TextFormField(
                       enabled: false,
